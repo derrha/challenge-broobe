@@ -15,5 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [HomeController::class, 'show'])->name('home.form');
-Route::post('/submit', [HomeController::class, 'submit'])->name('home.submit');
-
+Route::get('/fetch-metrics', [HomeController::class, 'fetchMetrics'])->name('home.fetchMetrics');
