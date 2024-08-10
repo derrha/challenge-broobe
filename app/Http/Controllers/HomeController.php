@@ -21,11 +21,15 @@ class HomeController extends Controller
     }
 
     /**
+     * @param Request $request
+     * Metodo que recibe la URL y los queryParams para luego realizar la consulta a la API de Google
+     * y devolver el resultado
      * @throws GuzzleException
+     * @return JsonResponse
      */
-    public function fetchMetrics(Request $request){
+    public function fetchMetrics(Request $request): JsonResponse{
         $url = $request->input('url');
-        $categoriesString = $request->input('categories', ''); // Recibe como cadena
+        $categoriesString = $request->input('categories', '');
         $strategy = $request->input('strategy');
 
         // Convertir la cadena de categorías en un array
@@ -35,15 +39,13 @@ class HomeController extends Controller
         $queryParams = [
             'url' => $url,
             'key' => 'AIzaSyDCrPAzhzWxZbJxPYIEURODTvBFVVRNHbY',
+            'strategy' => $strategy
         ];
 
         // Añadir categorías primero
         foreach ($categories as $category) {
             $queryParams['category'][] = $category;
         }
-
-        // Añadir la estrategia al final
-        $queryParams['strategy'] = $strategy;
 
         // Convertir los parámetros de consulta a un formato plano
         $flatQueryParams = [];
