@@ -4,28 +4,64 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Strategy;
-use Illuminate\Http\RedirectResponse;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 
 class HomeController extends Controller
 {
-    public function show():View{
+    public function show(): View
+    {
         $categories = Category::all();
         $strategies = Strategy::all();
 
         return view('home', compact('categories', 'strategies'));
     }
 
-    public function submit(Request $request):RedirectResponse{
-        // Aquí manejas la lógica para procesar la URL, categorías y estrategia seleccionadas
+    /**
+     * @throws GuzzleException
+     */
+    public function fetchMetrics(Request $request){
         $url = $request->input('url');
-        $categories = $request->input('categories', []);
-        $strategy_id = $request->input('strategy_id');
+        $categoriesString = $request->input('categories', ''); // Recibe como cadena
+        $strategy = $request->input('strategy');
 
-        // Puedes realizar las acciones necesarias, como llamar a una API para obtener las métricas
+        // Convertir la cadena de categorías en un array
+        $categories = array_filter(explode(',', $categoriesString));
 
-        // Redirigir o mostrar una vista con el resultado
-        return redirect()->back()->with('success', 'Métricas obtenidas correctamente.');
+        // Construir los parámetros de consulta
+        $queryParams = [
+            'url' => $url,
+            'key' => 'AIzaSyDCrPAzhzWxZbJxPYIEURODTvBFVVRNHbY',
+        ];
+
+        // Añadir categorías primero
+        foreach ($categories as $category) {
+            $queryParams['category'][] = $category;
+        }
+
+        // Añadir la estrategia al final
+        $queryParams['strategy'] = $strategy;
+
+        // Convertir los parámetros de consulta a un formato plano
+        $flatQueryParams = [];
+        foreach ($queryParams as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    $flatQueryParams[] = "$key=$item";
+                }
+            } else {
+                $flatQueryParams[] = "$key=$value";
+            }
+        }
+
+        $queryString = implode('&', $flatQueryParams);
+
+        $client = new Client();
+        $response = $client->request('GET', 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?' . $queryString);
+
+        return response()->json(json_decode($response->getBody()->getContents()));
     }
 }
