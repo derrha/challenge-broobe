@@ -18,9 +18,13 @@ class HomeController extends Controller
         $this->metricsService = $metricsService;
     }
 
-    public function show(): View{
+    public function show(): View
+    {
         $categories = Category::all();
         $strategies = Strategy::all();
+
+        //Formatear para UX
+        $categories = $this->formatCategories($categories);
 
         return view('home', compact('categories', 'strategies'));
     }
@@ -61,5 +65,19 @@ class HomeController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al guardar las métricas.', 'details' => $e->getMessage()], 500);
         }
+    }
+
+    private function formatCategories($categories): array{
+        return $categories->map(function($category) {
+            $categoryLabels = [
+                'ACCESSIBILITY' => 'Accesibilidad',
+                'BEST_PRACTICES' => 'Mejores Practicas',
+                'PERFORMANCE' => 'Rendimiento',
+                'PWA' => 'PWA',
+                'SEO' => 'SEO',
+            ];
+            $category->name = $categoryLabels[$category->name] ?? $category->name;
+            return $category;
+        })->toArray();
     }
 }
