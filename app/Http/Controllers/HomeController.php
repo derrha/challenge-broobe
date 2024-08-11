@@ -18,8 +18,7 @@ class HomeController extends Controller
         $this->metricsService = $metricsService;
     }
 
-    public function show(): View
-    {
+    public function show(): View{
         $categories = Category::all();
         $strategies = Strategy::all();
 
@@ -67,7 +66,7 @@ class HomeController extends Controller
         }
     }
 
-    private function formatCategories($categories): array{
+    private function formatCategories($categories): array {
         return $categories->map(function($category) {
             $categoryLabels = [
                 'ACCESSIBILITY' => 'Accesibilidad',
@@ -76,7 +75,11 @@ class HomeController extends Controller
                 'PWA' => 'PWA',
                 'SEO' => 'SEO',
             ];
-            $category->name = $categoryLabels[$category->name] ?? $category->name;
+
+            // Añadir la propiedad 'label' para la UX
+            $category->label = $categoryLabels[$category->name] ?? $category->name;
+
+            // Retornar el objeto de categoría con la nueva propiedad
             return $category;
         })->toArray();
     }

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     let latestMetrics = null;
 
-    const loader = document.getElementById('loader'); // Selecciona el loader
+    const loader = document.getElementById('loader');
     const errorContainer = document.getElementById('errorContainer');
     const submitButton = document.getElementById('submitButton');
 
@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
         errorContainer.innerHTML = '';
 
         submitButton.textContent = 'Cargando...';
-        loader.classList.remove('hidden'); // Muestra el loader
+        loader.classList.remove('hidden');
+        document.getElementById('noMetricsMessage').innerHTML = '';
 
         const url = document.querySelector('#url').value.trim();
         const selectedCategories = Array.from(document.querySelectorAll('.categories:checked')).map(cb => cb.value);
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
             .then(response => {
                 submitButton.textContent = 'Nueva Consulta';
-                loader.classList.add('hidden'); // Oculta el loader
+                loader.classList.add('hidden');
 
                 if (!response.ok) {
                     return response.json().then(data => {
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!document.getElementById('resultHeader')) {
                     const resultHeader = document.createElement('h2');
                     resultHeader.id = 'resultHeader';
-                    resultHeader.className = 'text-xl font-semibold text-white mb-4';
+                    resultHeader.className = 'text-xl font-semibold mb-4';
                     resultHeader.textContent = 'Resultado:';
                     document.getElementById('metricsResults').insertBefore(resultHeader, resultsDiv);
                 }
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (let key in latestMetrics) {
                     let category = latestMetrics[key];
                     let metricDiv = document.createElement('div');
-                    metricDiv.className = 'p-4 bg-gray-900 text-white rounded-md shadow flex justify-center items-center';
+                    metricDiv.className = 'p-4 bg-[#e23e80] text-white rounded-md shadow flex justify-center items-center';
 
                     metricDiv.innerHTML = `<strong>${category.title}</strong>: ${category.score}`;
                     resultsDiv.appendChild(metricDiv);
@@ -97,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             })
             .catch(error => {
-                loader.classList.add('hidden'); // Oculta el loader en caso de error
+                loader.classList.add('hidden');
                 errorContainer.innerHTML = error.message;
                 errorContainer.classList.remove('hidden');
                 submitButton.textContent = 'Nueva Consulta';

@@ -24,7 +24,6 @@
     <!-- Contenedor para el formulario -->
     <div class="w-72 bg-[#503FE0] p-4 shadow-lg text-white h-full">
         <form id="metricsForm" class="flex flex-col w-full gap-4">
-
             <!-- Contenedor para mostrar errores -->
             <div id="errorContainer" class="hidden p-4 mb-4 text-white bg-red-500 rounded-md"></div>
 
@@ -40,7 +39,7 @@
                         @foreach ($categories as $category)
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" id="category{{ $category['id'] }}" name="categories[]" value="{{ $category['name'] }}" class="categories h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                <label for="category{{ $category['id'] }}" class="block text-sm">{{ $category['name'] }}</label>
+                                <label for="category{{ $category['id'] }}" class="block text-sm">{{ $category['label'] }}</label>
                             </div>
                         @endforeach
                     </div>
@@ -61,12 +60,22 @@
     </div>
 
     <!-- Contenedor para mostrar las métricas -->
-    <div id="metricsResults" class="flex-grow p-6">
-        <div id="loader" class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white" role="status">
+    <div id="metricsResults" class="flex-grow p-6 flex items-center flex-col">
+        <!-- Loader -->
+        <div id="loader" class="hidden self-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-red-500 border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white" role="status">
             <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
         </div>
+
+        <!-- Mensaje cuando no hay métricas -->
+        <div id="noMetricsMessage" class="text-center text-xl font-semibold text-gray-500 ">
+            Aún no se han corrido métricas. <br> Realiza una consulta para obtener resultados!
+        </div>
+
+        <!-- Contenido de métricas -->
         <div id="metricsResultsContent" class="flex flex-wrap gap-5 justify-center items-center"></div>
-        <button id="saveMetricsButton" class="hidden mt-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Guardar Métricas</button>
+
+        <!-- Botón para guardar métricas -->
+        <button id="saveMetricsButton" class="hidden mt-4 py-2 px-4 max-h-12 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#887CF7]">Guardar Métricas</button>
     </div>
 </div>
 <script>
