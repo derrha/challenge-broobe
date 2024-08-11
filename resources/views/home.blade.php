@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Métricas</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-800 flex flex-col justify-center items-center w-screen gap-2">
@@ -18,6 +17,10 @@
 </div>
 <div class="mx-auto bg-gray-900 p-4 rounded-lg shadow-lg text-white w-full">
     <form id="metricsForm" class="flex flex-col w-full gap-4">
+
+        <!-- Contenedor para mostrar errores -->
+        <div id="errorContainer" class="hidden p-4 mb-4 text-white bg-red-600 rounded-md"></div>
+
         <div class="flex w-full justify-between">
             <div class="form-group w-80">
                 <label for="url" class="block text-sm font-medium">URL:</label>
@@ -47,21 +50,34 @@
                 </select>
             </div>
         </div>
-        <button type="submit" class="self-start py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Obtener Métricas</button>
+        <button type="submit" id="submitButton" class="self-start py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Obtener Métricas</button>
     </form>
 
     <!-- Contenedor para mostrar las métricas -->
-    <div id="metricsResults" class="mt-6"></div>
+    <div id="metricsResults" class="mt-6 flex flex-wrap gap-5 justify-center items-center"></div>
 </div>
 
 <script>
     document.getElementById('metricsForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
+        // Ocultar mensajes de error anteriores
+        const errorContainer = document.getElementById('errorContainer');
+        errorContainer.classList.add('hidden');
+        errorContainer.innerHTML = '';
+
+        // Cambiar el texto del botón a "Cargando..."
+        const submitButton = document.getElementById('submitButton');
+        submitButton.textContent = 'Cargando...';
+
         // Obtener los valores del formulario
         const url = document.querySelector('#url').value.trim();
-        const categories = Array.from(document.querySelectorAll('.categories:checked')).map(cb => cb.value);
+        const selectedCategories = Array.from(document.querySelectorAll('.categories:checked')).map(cb => cb.value);
         const strategy = document.querySelector('#strategy').value.trim();
+
+        // Si no hay categorías seleccionadas, incluir todas
+        const allCategories = Array.from(document.querySelectorAll('.categories')).map(cb => cb.value);
+        const categories = selectedCategories.length > 0 ? selectedCategories : allCategories;
 
         // Construir la URL de la solicitud con parámetros de consulta
         let queryParams = new URLSearchParams({
@@ -77,13 +93,17 @@
             }
         })
             .then(response => {
+                // Restaurar el texto original del botón
+                submitButton.textContent = 'Nueva Consulta';
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Error al procesar la solicitud.');
+                    });
                 }
                 return response.json();
             })
             .then(data => {
-                console.log(data.lighthouseResult);
                 let resultsDiv = document.getElementById('metricsResults');
                 resultsDiv.innerHTML = '';
 
@@ -91,13 +111,21 @@
                 for (let key in data.lighthouseResult.categories) {
                     let category = data.lighthouseResult.categories[key];
                     let metricDiv = document.createElement('div');
-                    metricDiv.className = 'mt-2 p-4 bg-gray-100 text-gray-900 rounded-md';
+                    metricDiv.className = 'mt-2 p-4 bg-gray-800 text-white rounded-md shadow';
 
                     metricDiv.innerHTML = `<strong>${category.title}:</strong> ${category.score * 100}`;
                     resultsDiv.appendChild(metricDiv);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                // Mostrar mensaje de error en el contenedor
+                errorContainer.innerHTML = error.message;
+                errorContainer.classList.remove('hidden');
+
+                // Restaurar el texto original del botón en caso de error
+                submitButton.textContent = 'Nueva Consulta';
+            });
     });
 </script>
 </body>
