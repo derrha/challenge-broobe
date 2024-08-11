@@ -23,19 +23,19 @@
 <div class="flex flex-col sm:flex-row flex-grow">
     <!-- Contenedor para el formulario -->
     <div class="w-full sm:w-72 bg-[#503FE0] p-4 shadow-lg text-white">
-        <form id="metricsForm" class="flex flex-col w-full gap-4">
+        <form id="metricsForm" class="flex flex-col w-full gap-6">
             <!-- Contenedor para mostrar errores -->
             <div id="errorContainer" class="hidden p-4 mb-4 text-white bg-red-500 rounded-md"></div>
 
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-8">
                 <div class="form-group">
-                    <label for="url" class="block text-sm font-medium">URL:</label>
-                    <input type="text" id="url" name="url" class="bg-[#887CF7] mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    <label for="url" class="block text-xl font-medium">URL:</label>
+                    <input type="text" id="url" name="url" class="bg-[#887CF7] mt-3 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                 </div>
 
                 <div class="form-group flex flex-col">
-                    <label class="block text-sm font-medium">Categorías:</label>
-                    <div class="pt-1 flex flex-wrap gap-2">
+                    <label class="block text-xl font-medium">Categorías:</label>
+                    <div class="pt-1 flex flex-wrap gap-2 flex-col mt-2" >
                         @foreach ($categories as $category)
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" id="category{{ $category['id'] }}" name="categories[]" value="{{ $category['name'] }}" class="categories h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
@@ -46,8 +46,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="strategy" class="block text-sm font-medium">Estrategia:</label>
-                    <select id="strategy" name="strategy" class="bg-[#887CF7] mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
+                    <label for="strategy" class="block text-xl font-medium">Estrategia:</label>
+                    <select id="strategy" name="strategy" class="bg-[#887CF7] mt-3 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
                         @foreach ($strategies as $strategy)
                             <option value="{{ $strategy->name }}" data-id="{{ $strategy->id }}">{{ $strategy->name }}</option>
                         @endforeach
@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <button type="submit" id="submitButton" class="self-start py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md bg-white focus:outline-none text-[#503FE0]">Obtener Métricas</button>
+            <button type="submit" id="submitButton" class="mt-2 self-start py-2 px-4 w-full border border-transparent shadow-sm text-sm font-medium rounded-md bg-white focus:outline-none text-[#503FE0] hover:bg-[#1D1D20] hover:text-white ease-in-out">Obtener Métricas</button>
         </form>
     </div>
 
