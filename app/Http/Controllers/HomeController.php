@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\MetricHistoryRun;
 use App\Models\Strategy;
 use App\Services\MetricsService;
 use Illuminate\Http\Request;
@@ -27,6 +28,12 @@ class HomeController extends Controller
 
         return view('home', compact('categories', 'strategies'));
     }
+
+    public function showHistory():View{
+        $metricHistory = MetricHistoryRun::with('strategy')->orderBy('created_at', 'desc')->get();
+        return view('history', ['metricHistory' => $metricHistory]);
+    }
+
 
     /**
      * @param Request $request
