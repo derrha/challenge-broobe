@@ -2,14 +2,16 @@
 
 namespace App\Services;
 
+use App\Models\MetricHistoryRun;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\DB;
 
-class PageSpeedService
+class MetricsService
 {
-    private $client;
-    private $apiKey;
+    private Client $client;
+    private mixed $apiKey;
 
     public function __construct()
     {
@@ -60,11 +62,36 @@ class PageSpeedService
         }
     }
 
+    public function saveMetrics(string $url, array $metrics, int $strategyId): bool{
+        // Extraer las métricas necesarias
+        $accessibility = $metrics['accessibility']['score'] ?? 0;
+        $pwa = $metrics['pwa']['score'] ?? 0;
+        $performance = $metrics['performance']['score'] ?? 0;
+        $seo = $metrics['seo']['score'] ?? 0;
+        $bestPractices = $metrics['best-practices']['score'] ?? 0;
+
+        // Guardar las métricas en la base de datos
+        $model = new MetricHistoryRun();
+
+        $model->fill([
+            'url' => $url,
+            'accessibility_metric' => $accessibility,
+            'pwa_metric' => $pwa,
+            'performance_metric' => $performance,
+            'seo_metric' => $seo,
+            'best_practices_metric' => $bestPractices,
+            'strategy_id' => $strategyId
+        ]);
+        if ($model->save()){
+            return true;
+        }
+        return false;
+    }
+
     private function validateUrl(string $url): bool
     {
         $parsedUrl = parse_url($url);
 
-        // Verificar si la URL tiene un esquema y si es 'http' o 'https'
         if ($parsedUrl === false || !isset($parsedUrl['scheme']) || !in_array($parsedUrl['scheme'], ['http', 'https'])) {
             return false;
         }

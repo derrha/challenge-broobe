@@ -45,7 +45,7 @@
                 <label for="strategy" class="block text-sm font-medium">Estrategia:</label>
                 <select id="strategy" name="strategy" class="bg-gray-600 mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
                     @foreach ($strategies as $strategy)
-                        <option value="{{ $strategy->name }}">{{ $strategy->name }}</option>
+                        <option value="{{ $strategy->name }}" data-id="{{ $strategy->id }}">{{ $strategy->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -57,9 +57,12 @@
 <!-- Contenedor para mostrar las métricas -->
 <div id="metricsResults" class="mt-6 flex flex-col items-center">
     <div id="metricsResultsContent" class="flex flex-wrap gap-5 justify-center items-center"></div>
+    <button id="saveMetricsButton" class="hidden mt-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Guardar Métricas</button>
 </div>
 
 <script>
+    let latestMetrics = null;
+
     document.getElementById('metricsForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -75,7 +78,9 @@
         // Obtener los valores del formulario
         const url = document.querySelector('#url').value.trim();
         const selectedCategories = Array.from(document.querySelectorAll('.categories:checked')).map(cb => cb.value);
-        const strategy = document.querySelector('#strategy').value.trim();
+        const strategySelect = document.querySelector('#strategy');
+        const strategy = strategySelect.value.trim();
+        const strategyId = strategySelect.options[strategySelect.selectedIndex].getAttribute('data-id');
 
         // Si no hay categorías seleccionadas, incluir todas
         const allCategories = Array.from(document.querySelectorAll('.categories')).map(cb => cb.value);
@@ -108,6 +113,7 @@
             .then(data => {
                 let resultsDiv = document.getElementById('metricsResultsContent');
                 resultsDiv.innerHTML = '';
+                latestMetrics = data.lighthouseResult.categories;
 
                 // Agregar encabezado de "Resultado" solo si no está presente
                 if (!document.getElementById('resultHeader')) {
@@ -119,15 +125,43 @@
                 }
 
                 // Mostrar resultados
-                for (let key in data.lighthouseResult.categories) {
-                    let category = data.lighthouseResult.categories[key];
+                for (let key in latestMetrics) {
+                    let category = latestMetrics[key];
                     let metricDiv = document.createElement('div');
-                    metricDiv.className = 'p-4 bg-gray-900 text-white rounded-md shadow flex flex-col items-center';
+                    metricDiv.className = 'p-4 bg-gray-900 text-white rounded-md shadow flex justify-center items-center';
 
-                    // Mostrar el título encima del puntaje
-                    metricDiv.innerHTML = `<div class="text-lg mb-2">${category.title}</div><div class="text-4xl">${category.score}</div>`;
+                    metricDiv.innerHTML = `<strong>${category.title}</strong>: ${category.score}`;
                     resultsDiv.appendChild(metricDiv);
                 }
+
+                // Mostrar botón para guardar métricas
+                const saveButton = document.getElementById('saveMetricsButton');
+                saveButton.classList.remove('hidden');
+                saveButton.addEventListener('click', function() {
+                    fetch('{{ route('home.saveMetrics') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            url: url,
+                            metrics: data.lighthouseResult.categories,
+                            strategy_id: strategyId
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Métricas guardadas exitosamente.');
+                            } else {
+                                console.error('Error al guardar las métricas:', data.details);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -135,7 +169,7 @@
                 errorContainer.innerHTML = error.message;
                 errorContainer.classList.remove('hidden');
 
-                // Restaurar el texto original del botón en caso de error
+                // Restaurar el texto original
                 submitButton.textContent = 'Nueva Consulta';
             });
     });

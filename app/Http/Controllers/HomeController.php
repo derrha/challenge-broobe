@@ -4,18 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Strategy;
-use App\Services\PageSpeedService;
+use App\Services\MetricsService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    private PageSpeedService $pageSpeedService;
+    private MetricsService $metricsService;
 
-    public function __construct(PageSpeedService $pageSpeedService)
+    public function __construct(MetricsService $metricsService)
     {
-        $this->pageSpeedService = $pageSpeedService;
+        $this->metricsService = $metricsService;
     }
 
     public function show(): View{
@@ -39,13 +39,27 @@ class HomeController extends Controller
             $categories = array_filter(explode(',', $categoriesString));
 
             // Obtener métricas desde el servicio
-            $metrics = $this->pageSpeedService->fetchMetrics($url, $categories, $strategy);
+            $metrics = $this->metricsService->fetchMetrics($url, $categories, $strategy);
 
             return response()->json($metrics);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage(), 'details' => $e->getPrevious()->getMessage()], 500);
+        }
+    }
+
+    public function saveMetrics(Request $request): JsonResponse
+    {
+        $url = $request->input('url');
+        $metrics = $request->input('metrics');
+        $strategyId = $request->input('strategy_id');
+
+        try {
+            $this->metricsService->saveMetrics($url, $metrics, $strategyId);
+            return response()->json(['success' => 'Métricas guardadas exitosamente.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al guardar las métricas.', 'details' => $e->getMessage()], 500);
         }
     }
 }
