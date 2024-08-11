@@ -17,7 +17,6 @@ Primero, clona el repositorio desde GitHub dentro del entorno de desarrollo de L
 
 ```bash
 git clone https://github.com/derrha/challenge-broobe.git
-cd challenge-broobe
 ```
 
 ### 2. Ejecutar el proyecto
@@ -43,15 +42,21 @@ Para instalar las dependencias de PHP del proyecto, necesitarás ingresar al ent
     ```bash
    npm run build 
     ```
-5. **Ejecutar el servidor:**
-    ```bash
-   php artisan serve
-    ```
+5. **Crear Base de datos:**
+    - Dentro de Laragon abrimos nuestra base de datos por defecto
+    - Allí creamos una nueva base de datos llamada "broobe-db"
+      
 6. **Ejecutar las migraciones junto con los datos de prueba:**
 
    ```bash
    php artisan migrate:fresh --seed
     ```
+7. **Ejecutar el servidor:**
+
+   ```bash
+   php artisan serve
+    ```
+   
 ## USO
 **Acceder a la Aplicación:**
 - Abre tu navegador y ve a http://localhost (o el puerto configurado en Laragon) para acceder a la aplicación.
