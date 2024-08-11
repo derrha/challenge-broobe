@@ -12,17 +12,17 @@
 </head>
 <body class="flex flex-col h-screen w-screen bg-gray-100">
 <nav class="w-full h-24 bg-[#503FE0] flex items-center">
-    <img class="ml-10" src="https://www.broobe.com/wp-content/uploads/2022/12/logo-broobe.svg" alt="broobe-logo">
+    <img class="ml-4 sm:ml-10 h-8" src="https://www.broobe.com/wp-content/uploads/2022/12/logo-broobe.svg" alt="broobe-logo">
     <div class="w-full h-24 bg-[#503FE0] flex justify-center items-center gap-4">
-        <button class="text-xl font-medium text-white uppercase border-b-2 border-white">Correr Métricas</button>
-        <span class="text-3xl text-white">/</span>
-        <button class="text-xl font-medium uppercase text-white">Historial</button>
+        <button class="text-lg sm:text-xl font-medium text-white uppercase border-b-2 border-white">Correr Métricas</button>
+        <span class="text-2xl sm:text-3xl text-white">/</span>
+        <button class="text-lg sm:text-xl font-medium uppercase text-white">Historial</button>
     </div>
 </nav>
 
-<div class="flex flex-grow">
+<div class="flex flex-col sm:flex-row flex-grow">
     <!-- Contenedor para el formulario -->
-    <div class="w-72 bg-[#503FE0] p-4 shadow-lg text-white h-full">
+    <div class="w-full sm:w-72 bg-[#503FE0] p-4 shadow-lg text-white">
         <form id="metricsForm" class="flex flex-col w-full gap-4">
             <!-- Contenedor para mostrar errores -->
             <div id="errorContainer" class="hidden p-4 mb-4 text-white bg-red-500 rounded-md"></div>
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Mensaje cuando no hay métricas -->
-        <div id="noMetricsMessage" class="text-center text-xl font-semibold text-gray-500 ">
+        <div id="noMetricsMessage" class="text-center text-lg sm:text-xl font-semibold text-gray-500 ">
             Aún no se han corrido métricas. <br> Realiza una consulta para obtener resultados!
         </div>
 
