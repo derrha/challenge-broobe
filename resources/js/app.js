@@ -87,7 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                alert('Métricas guardadas exitosamente.');
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "success",
+                                    title: "Metricas guardadas!",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
                             } else {
                                 console.error('Error al guardar las métricas:', data.details);
                             }
