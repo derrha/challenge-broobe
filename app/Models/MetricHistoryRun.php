@@ -23,6 +23,6 @@ class MetricHistoryRun extends Model
     ];
 
     public function strategy(): BelongsTo{
-        return $this->belongsTo(Strategy::class);
+        return $this->belongsTo(Strategy::class, 'strategy_id');
     }
 }

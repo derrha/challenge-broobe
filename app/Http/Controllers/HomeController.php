@@ -26,10 +26,10 @@ class HomeController extends Controller
         //Formatear para UX
         $categories = $this->formatCategories($categories);
 
-        return view('home', compact('categories', 'strategies'));
+        return view('metrics', compact('categories', 'strategies'));
     }
 
-    public function showHistory():View{
+    public function showHistory(): View{
         $metricHistory = MetricHistoryRun::with('strategy')->orderBy('created_at', 'desc')->get();
         return view('history', ['metricHistory' => $metricHistory]);
     }
