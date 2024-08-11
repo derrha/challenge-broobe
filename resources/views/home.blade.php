@@ -52,9 +52,11 @@
         </div>
         <button type="submit" id="submitButton" class="self-start py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Obtener Métricas</button>
     </form>
+</div>
 
-    <!-- Contenedor para mostrar las métricas -->
-    <div id="metricsResults" class="mt-6 flex flex-wrap gap-5 justify-center items-center"></div>
+<!-- Contenedor para mostrar las métricas -->
+<div id="metricsResults" class="mt-6 flex flex-col items-center">
+    <div id="metricsResultsContent" class="flex flex-wrap gap-5 justify-center items-center"></div>
 </div>
 
 <script>
@@ -104,16 +106,26 @@
                 return response.json();
             })
             .then(data => {
-                let resultsDiv = document.getElementById('metricsResults');
+                let resultsDiv = document.getElementById('metricsResultsContent');
                 resultsDiv.innerHTML = '';
+
+                // Agregar encabezado de "Resultado" solo si no está presente
+                if (!document.getElementById('resultHeader')) {
+                    const resultHeader = document.createElement('h2');
+                    resultHeader.id = 'resultHeader';
+                    resultHeader.className = 'text-xl font-semibold text-white mb-4';
+                    resultHeader.textContent = 'Resultado:';
+                    document.getElementById('metricsResults').insertBefore(resultHeader, resultsDiv);
+                }
 
                 // Mostrar resultados
                 for (let key in data.lighthouseResult.categories) {
                     let category = data.lighthouseResult.categories[key];
                     let metricDiv = document.createElement('div');
-                    metricDiv.className = 'mt-2 p-4 bg-gray-800 text-white rounded-md shadow';
+                    metricDiv.className = 'p-4 bg-gray-900 text-white rounded-md shadow flex flex-col items-center';
 
-                    metricDiv.innerHTML = `<strong>${category.title}:</strong> ${category.score * 100}`;
+                    // Mostrar el título encima del puntaje
+                    metricDiv.innerHTML = `<div class="text-lg mb-2">${category.title}</div><div class="text-4xl">${category.score}</div>`;
                     resultsDiv.appendChild(metricDiv);
                 }
             })
