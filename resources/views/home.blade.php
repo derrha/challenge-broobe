@@ -4,175 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Métricas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-800 flex flex-col justify-center items-center w-screen gap-2">
-<nav class="w-full h-24 bg-gray-900 flex justify-center items-center">
-    <h1 class="text-3xl text-white font-bold text-center uppercase">Challenge Broobe</h1>
-</nav>
-<div class="w-full h-24 bg-gray-900 flex justify-center items-center gap-4">
-    <button class="text-xl text-white border-b-4 border-red-500">Run Metric</button>
-    <button class="text-xl text-white">Metric History</button>
-</div>
-<div class="mx-auto bg-gray-900 p-4 rounded-lg shadow-lg text-white w-full">
-    <form id="metricsForm" class="flex flex-col w-full gap-4">
+<body class="flex flex-col justify-center items-center w-screen gap-2">
+    <nav class="w-full h-24 bg-[#503FE0] flex">
+        <img class="ml-10" src="https://www.broobe.com/wp-content/uploads/2022/12/logo-broobe.svg" alt="broobe-logo">
+        <div class="w-full h-24 bg-[#503FE0] flex justify-center items-center gap-4">
+            <button class="text-xl font-medium text-white uppercase border-b-2 border-white">Correr Metricas</button>
+            <span class="text-3xl text-white">/</span>
+            <button class="text-xl font-medium uppercase text-white">Historial</button>
+        </div>
+    </nav>
+    <div class="mx-auto bg-[#503FE0] p-4 rounded-lg shadow-lg text-white w-full">
+        <form id="metricsForm" class="flex flex-col w-full gap-4">
 
-        <!-- Contenedor para mostrar errores -->
-        <div id="errorContainer" class="hidden p-4 mb-4 text-white bg-red-600 rounded-md"></div>
+            <!-- Contenedor para mostrar errores -->
+            <div id="errorContainer" class="hidden p-4 mb-4 text-white bg-red-500 rounded-md"></div>
 
-        <div class="flex w-full justify-between">
-            <div class="form-group w-80">
-                <label for="url" class="block text-sm font-medium">URL:</label>
-                <input type="text" id="url" name="url" class="bg-gray-600 mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-            </div>
+            <div class="flex w-full justify-between">
+                <div class="form-group w-80">
+                    <label for="url" class="block text-sm font-medium">URL:</label>
+                    <input type="text" id="url" name="url" class="bg-[#887CF7] mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
 
-            <div class="form-group flex mx-10 gap-2 flex-col w-full">
-                <label class="block text-sm font-medium">Categorías:</label>
-                <div class="pt-1">
-                    <div class="flex items-center justify-between">
-                        @foreach ($categories as $category)
-                            <div class="flex items-center">
-                                <input type="checkbox" id="category{{ $category->id }}" name="categories[]" value="{{ $category->name }}" class="categories h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                <label for="category{{ $category->id }}" class="ml-2 block text-sm">{{ $category->name }}</label>
-                            </div>
-                        @endforeach
+                <div class="form-group flex mx-10 gap-2 flex-col w-full">
+                    <label class="block text-sm font-medium">Categorías:</label>
+                    <div class="pt-1">
+                        <div class="flex items-center justify-between">
+                            @foreach ($categories as $category)
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="category{{ $category->id }}" name="categories[]" value="{{ $category->name }}" class="categories h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="category{{ $category->id }}" class="ml-2 block text-sm">{{ $category->name }}</label>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
+
+                <div class="form-group w-80">
+                    <label for="strategy" class="block text-sm font-medium">Estrategia:</label>
+                    <select id="strategy" name="strategy" class="bg-[#887CF7] mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
+                        @foreach ($strategies as $strategy)
+                            <option value="{{ $strategy->name }}" data-id="{{ $strategy->id }}">{{ $strategy->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
+            <button type="submit" id="submitButton" class="self-start py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md bg-white focus:outline-none text-[#503FE0]">Obtener Métricas</button>
+        </form>
+    </div>
 
-            <div class="form-group w-80">
-                <label for="strategy" class="block text-sm font-medium">Estrategia:</label>
-                <select id="strategy" name="strategy" class="bg-gray-600 mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" required>
-                    @foreach ($strategies as $strategy)
-                        <option value="{{ $strategy->name }}" data-id="{{ $strategy->id }}">{{ $strategy->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-        <button type="submit" id="submitButton" class="self-start py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Obtener Métricas</button>
-    </form>
-</div>
-
-<!-- Contenedor para mostrar las métricas -->
-<div id="metricsResults" class="mt-6 flex flex-col items-center">
-    <div id="metricsResultsContent" class="flex flex-wrap gap-5 justify-center items-center"></div>
-    <button id="saveMetricsButton" class="hidden mt-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Guardar Métricas</button>
-</div>
-
-<script>
-    let latestMetrics = null;
-
-    document.getElementById('metricsForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        // Ocultar mensajes de error anteriores
-        const errorContainer = document.getElementById('errorContainer');
-        errorContainer.classList.add('hidden');
-        errorContainer.innerHTML = '';
-
-        // Cambiar el texto del botón a "Cargando..."
-        const submitButton = document.getElementById('submitButton');
-        submitButton.textContent = 'Cargando...';
-
-        // Obtener los valores del formulario
-        const url = document.querySelector('#url').value.trim();
-        const selectedCategories = Array.from(document.querySelectorAll('.categories:checked')).map(cb => cb.value);
-        const strategySelect = document.querySelector('#strategy');
-        const strategy = strategySelect.value.trim();
-        const strategyId = strategySelect.options[strategySelect.selectedIndex].getAttribute('data-id');
-
-        // Si no hay categorías seleccionadas, incluir todas
-        const allCategories = Array.from(document.querySelectorAll('.categories')).map(cb => cb.value);
-        const categories = selectedCategories.length > 0 ? selectedCategories : allCategories;
-
-        // Construir la URL de la solicitud con parámetros de consulta
-        let queryParams = new URLSearchParams({
-            url: url,
-            categories: categories.join(','),
-            strategy: strategy
-        }).toString();
-
-        fetch(`{{ route('home.fetchMetrics') }}?${queryParams}`, {
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-            .then(response => {
-                // Restaurar el texto original del botón
-                submitButton.textContent = 'Nueva Consulta';
-
-                if (!response.ok) {
-                    return response.json().then(data => {
-                        throw new Error(data.error || 'Error al procesar la solicitud.');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                let resultsDiv = document.getElementById('metricsResultsContent');
-                resultsDiv.innerHTML = '';
-                latestMetrics = data.lighthouseResult.categories;
-
-                // Agregar encabezado de "Resultado" solo si no está presente
-                if (!document.getElementById('resultHeader')) {
-                    const resultHeader = document.createElement('h2');
-                    resultHeader.id = 'resultHeader';
-                    resultHeader.className = 'text-xl font-semibold text-white mb-4';
-                    resultHeader.textContent = 'Resultado:';
-                    document.getElementById('metricsResults').insertBefore(resultHeader, resultsDiv);
-                }
-
-                // Mostrar resultados
-                for (let key in latestMetrics) {
-                    let category = latestMetrics[key];
-                    let metricDiv = document.createElement('div');
-                    metricDiv.className = 'p-4 bg-gray-900 text-white rounded-md shadow flex justify-center items-center';
-
-                    metricDiv.innerHTML = `<strong>${category.title}</strong>: ${category.score}`;
-                    resultsDiv.appendChild(metricDiv);
-                }
-
-                // Mostrar botón para guardar métricas
-                const saveButton = document.getElementById('saveMetricsButton');
-                saveButton.classList.remove('hidden');
-                saveButton.addEventListener('click', function() {
-                    fetch('{{ route('home.saveMetrics') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({
-                            url: url,
-                            metrics: data.lighthouseResult.categories,
-                            strategy_id: strategyId
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Métricas guardadas exitosamente.');
-                            } else {
-                                console.error('Error al guardar las métricas:', data.details);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Mostrar mensaje de error en el contenedor
-                errorContainer.innerHTML = error.message;
-                errorContainer.classList.remove('hidden');
-
-                // Restaurar el texto original
-                submitButton.textContent = 'Nueva Consulta';
-            });
-    });
-</script>
+    <!-- Contenedor para mostrar las métricas -->
+    <div id="metricsResults" class="mt-6 flex flex-col items-center">
+        <div id="metricsResultsContent" class="flex flex-wrap gap-5 justify-center items-center"></div>
+        <button id="saveMetricsButton" class="hidden mt-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Guardar Métricas</button>
+    </div>
+    <div id="loader" class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white" role="status">
+        <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
+    </div>
+    <script>
+        const fetchMetricsRoute = "{{ route('home.fetchMetrics') }}";
+        const saveMetricsRoute = "{{ route('home.saveMetrics') }}";
+    </script>
 </body>
 </html>
